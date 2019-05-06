@@ -107,7 +107,12 @@ def read_tablet(args):
     monitor = get_monitors()[args.monitor]
     log.debug('Chose monitor: {}'.format(monitor))
 
-    stdout = open_eventfile(args)
+    try:
+        stdout = open_eventfile(args)
+    except Exception as e:
+        print("Please check your remarkable is connected to the USB and unlocked, and retry.")
+        log.debug(e)
+        return
 
     while True:
         _, _, e_type, e_code, e_value = struct.unpack('2IHHi', stdout.read(16))
@@ -164,11 +169,7 @@ def main():
             logging.getLogger('').setLevel(logging.DEBUG)
             log.setLevel(logging.DEBUG)
 
-        try:
-            read_tablet(args)
-        except Exception as e:
-            print("Please check your remarkable is connected to the USB and unlocked, and retry.")
-            log.debug(e)
+        read_tablet(args)
 
     except KeyboardInterrupt:
         pass
