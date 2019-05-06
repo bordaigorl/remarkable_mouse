@@ -88,6 +88,7 @@ def open_eventfile(args, file='/dev/input/event0'):
         username='root',
         password=password,
         pkey=pkey,
+        timeout=args.timeout,
         look_for_keys=False
     )
     print("Connected to {}".format(args.address))
@@ -153,6 +154,7 @@ def main():
         parser.add_argument('--key', type=str, metavar='PATH', help="ssh private key")
         parser.add_argument('--password', default=None, type=str, help="ssh password")
         parser.add_argument('--address', default='10.11.99.1', type=str, help="device address")
+        parser.add_argument('--timeout', default=1, type=int, metavar='SEC', help="ssh timeout in seconds")
         parser.add_argument('--threshold', default=1000, type=int, help="stylus pressure threshold (default 1000)")
 
         args = parser.parse_args()
@@ -162,7 +164,12 @@ def main():
             logging.getLogger('').setLevel(logging.DEBUG)
             log.setLevel(logging.DEBUG)
 
-        read_tablet(args)
+        try:
+            read_tablet(args)
+        except Exception as e:
+            print("Please check your remarkable is connected to the USB and unlocked, and retry.")
+            log.debug(e)
+
     except KeyboardInterrupt:
         pass
 
